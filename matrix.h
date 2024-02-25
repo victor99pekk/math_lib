@@ -1,3 +1,8 @@
+/**
+ * @file matrix.h
+ * @brief Header file for matrix operations.
+ */
+
 #ifndef matrix_H_
 #define matrix_H_
 
@@ -18,22 +23,40 @@
 #endif // NN_ASSERT
 #include <stdbool.h>
 
-typedef struct{
-    size_t rows;
-    size_t cols;
-    size_t stride;
-    float *es;
+/**
+ * @struct Mat
+ * @brief Represents a matrix with its dimensions, stride, and elements.
+ */
+typedef struct {
+    size_t rows;       /**< Number of rows in the matrix. */
+    size_t cols;       /**< Number of columns in the matrix. */
+    size_t stride;     /**< Number of elements between successive rows (useful for submatrices). */
+    float *es;         /**< Pointer to the matrix elements. */
 } Mat;
 
+/**
+ * @def MAT_AT(m, i, j)
+ * @brief Accesses the element at the i-th row and j-th column of matrix m.
+ */
 #define MAT_AT(m, i , j) (m).es[(i)*(m).stride + (j)]
 #define MAT_PRINT(m) mat_print(m, #m, 0);
 
-
+/**
+ * @brief Generates a random float between 0 and 1.
+ * @return Random float between 0 and 1.
+ */
 float rand_float(void)
 {
     return (float)rand() / (float) RAND_MAX;
 }
 
+
+/**
+ * @brief Allocates memory for a matrix with the given number of rows and columns.
+ * @param rows Number of rows in the matrix.
+ * @param cols Number of columns in the matrix.
+ * @return A newly allocated matrix.
+ */
 Mat mat_alloc(size_t rows, size_t cols)
 {
     Mat m;
@@ -50,6 +73,10 @@ float sigmoidf(float x)
     return 1.f / (1.f + expf(-x));
 }
 
+/**
+ * @brief Applies the sigmoid function element-wise to the matrix.
+ * @param m Matrix to be modified in-place.
+ */
 void mat_sig(Mat m)
 {
     for(size_t i = 0; i < m.rows; i++){
@@ -59,6 +86,12 @@ void mat_sig(Mat m)
     }
 }
 
+/**
+ * @brief Performs matrix multiplication: dst = a * b.
+ * @param dst Resultant matrix.
+ * @param a First matrix.
+ * @param b Second matrix.
+ */
 void mat_dot(Mat dst, Mat a, Mat b)
 {
     matrix_ASSERT(a.cols == b.rows);
@@ -76,6 +109,12 @@ void mat_dot(Mat dst, Mat a, Mat b)
     }
 }
 
+/**
+ * @brief Extracts a row from the matrix and returns it as a new matrix.
+ * @param m Matrix from which to extract the row.
+ * @param row Index of the row to be extracted.
+ * @return Extracted row as a new matrix.
+ */
 Mat mat_row(Mat m, size_t row)
 {
     return (Mat){
@@ -86,6 +125,12 @@ Mat mat_row(Mat m, size_t row)
     };
 }
 
+/**
+ * @brief Extracts a column from the matrix and returns it as a new matrix.
+ * @param m Matrix from which to extract the column.
+ * @param col Index of the column to be extracted.
+ * @return Extracted column as a new matrix.
+ */
 Mat mat_col(Mat m, size_t col)
 {
     Mat result = mat_alloc(m.rows, 1);
@@ -95,6 +140,11 @@ Mat mat_col(Mat m, size_t col)
     return result;
 }
 
+/**
+ * @brief Copies the content of one matrix to another.
+ * @param dst Destination matrix.
+ * @param src Source matrix.
+ */
 void mat_copy(Mat dst, Mat src)
 {
     matrix_ASSERT(dst.rows == src.rows);
@@ -106,6 +156,11 @@ void mat_copy(Mat dst, Mat src)
     }
 }
 
+/**
+ * @brief Adds the elements of one matrix to another matrix.
+ * @param dst Matrix to be updated.
+ * @param a Matrix to be added.
+ */
 void mat_sum(Mat dst, Mat a)
 {
     matrix_ASSERT(dst.rows == a.rows);
@@ -117,6 +172,12 @@ void mat_sum(Mat dst, Mat a)
     }
 }
 
+/**
+ * @brief Prints the content of the matrix.
+ * @param m Matrix to be printed.
+ * @param name Name of the matrix (for display purposes).
+ * @param padding Number of spaces for indentation.
+ */
 void mat_print(Mat m, const char *name, int padding)
 {
     printf("%*s%s: \n", (int)padding, "", name);
@@ -130,6 +191,11 @@ void mat_print(Mat m, const char *name, int padding)
     printf("\n");
 }
 
+/**
+ * @brief Fills the matrix with a specified value.
+ * @param m Matrix to be filled.
+ * @param x Value to fill the matrix with.
+ */
 void mat_fill(Mat m, float x)
 {
     for(size_t i = 0; i < m.rows; i++){
@@ -139,6 +205,12 @@ void mat_fill(Mat m, float x)
     }
 }
 
+/**
+ * @brief Fills the matrix with random values in the specified range.
+ * @param m Matrix to be filled.
+ * @param low Lower bound of the random values.
+ * @param high Upper bound of the random values.
+ */
 void mat_rand(Mat m, float low, float high)
 {
     for(size_t i = 0; i < m.rows; i++){
@@ -148,6 +220,12 @@ void mat_rand(Mat m, float low, float high)
     }
 }
 
+/**
+ * @brief Fills the matrix with a specified value in a symmetric pattern.
+ * @param m Matrix to be filled.
+ * @param low Lower bound of the values.
+ * @param high Upper bound of the values.
+ */
 void mat_symmetric_rand(Mat m, float low, float high)
 {
     for(size_t i = 0; i < m.cols; i++){
@@ -158,6 +236,10 @@ void mat_symmetric_rand(Mat m, float low, float high)
     }
 }
 
+/**
+ * @brief Makes the matrix diagonally dominant.
+ * @param m Matrix to be modified.
+ */
 void diagonalDominant(Mat m)
 {
     for(size_t i = 0; i < m.rows; i++){
@@ -171,6 +253,11 @@ void diagonalDominant(Mat m)
     }
 }
 
+/**
+ * @brief Fills the matrix with values from a flat data array.
+ * @param m Matrix to be filled.
+ * @param data Flat array of values.
+ */
 void fill_matrix(Mat m, float *data)
 {
     for(size_t i = 0; i < m.rows; i++){
@@ -180,6 +267,11 @@ void fill_matrix(Mat m, float *data)
     }
 }
 
+/**
+ * @brief Fills the matrix with values from a flat array.
+ * @param m Matrix to be filled.
+ * @param array Flat array of values.
+ */
 void fill_with_array(Mat m, float array[])
 {
     for(size_t i = 0; i < m.rows; i++){
@@ -190,6 +282,12 @@ void fill_with_array(Mat m, float array[])
 
 }
 
+/**
+ * @brief Fills a specific column of the matrix with values from a flat array.
+ * @param m Matrix to be filled.
+ * @param array Flat array of values.
+ * @param col Column index to be filled.
+ */
 void fill_with_array_col(Mat m, float array[], size_t col)
 {
     for(size_t i = 0; i < m.rows; i++){
@@ -197,6 +295,13 @@ void fill_with_array_col(Mat m, float array[], size_t col)
     }
 }
 
+/**
+ * @brief Copies a column from one matrix to another matrix.
+ * @param dst Destination matrix.
+ * @param src Source matrix.
+ * @param destCol Destination column index.
+ * @param srcCol Source column index.
+ */
 void copy_col(Mat dst, Mat src, int destCol, int srcCol)
 {
     for(size_t i = 0; i < src.rows; i++){
@@ -204,9 +309,12 @@ void copy_col(Mat dst, Mat src, int destCol, int srcCol)
     }
 }
 
-
-
-
+/**
+ * @brief Switches two rows in the matrix.
+ * @param m Matrix to be modified.
+ * @param row1 Index of the first row.
+ * @param row2 Index of the second row.
+ */
 void switchRow(Mat m, int row1, int row2) {
     for (int i = 0; i < m.cols; ++i) {
         float temp = MAT_AT(m, row1, i);
@@ -215,6 +323,11 @@ void switchRow(Mat m, int row1, int row2) {
     }
 }
 
+/**
+ * @brief Fills the matrix with the identity matrix.
+ * @param m Matrix to be filled.
+ * @return Matrix filled with the identity values.
+ */
 Mat fill_identity(Mat m)
 {
     m = mat_alloc(m.rows, m.cols);
@@ -230,6 +343,14 @@ Mat fill_identity(Mat m)
     return m;
 }
 
+/**
+ * @brief Subtracts two columns from different matrices.
+ * @param a First matrix.
+ * @param b Second matrix.
+ * @param colA Column index from matrix a.
+ * @param colB Column index from matrix b.
+ * @return Resulting matrix after subtraction.
+ */
 Mat subtract_cols(Mat a, Mat b, int colA, int colB)
 {
     Mat result = mat_alloc(a.rows, 1);
@@ -239,6 +360,14 @@ Mat subtract_cols(Mat a, Mat b, int colA, int colB)
     return result;
 }
 
+/**
+ * @brief Prepares the matrix for elimination during Gaussian elimination.
+ * @param m Matrix to be prepared.
+ * @param x Placeholder matrix.
+ * @param identity Identity matrix.
+ * @param index Index indicating the current step in elimination.
+ * @param ndim Number of dimensions (rows/columns) in the matrix.
+ */
 void prepare(Mat m, Mat x, Mat identity, int index, int ndim) {
     matrix_ASSERT(m.rows == x.rows);
 
@@ -264,6 +393,12 @@ void prepare(Mat m, Mat x, Mat identity, int index, int ndim) {
     }
 }
 
+/**
+ * @brief Performs Gaussian elimination on the matrix.
+ * @param m Matrix to be modified.
+ * @param x Placeholder matrix.
+ * @param identity Identity matrix.
+ */
 void eliminate(Mat m, Mat x, Mat identity)
 {
     for(size_t i = 0; i < m.cols; i++){
@@ -281,6 +416,12 @@ void eliminate(Mat m, Mat x, Mat identity)
     }
 }
 
+/**
+ * @brief Performs back substitution on the matrix to find the solution.
+ * @param m Matrix resulting from Gaussian elimination.
+ * @param x Placeholder matrix.
+ * @return Solution matrix.
+ */
 Mat back_sub(Mat m, Mat x)
 {
 
@@ -300,6 +441,11 @@ Mat back_sub(Mat m, Mat x)
     return result;
 }
 
+/**
+ * @brief Transposes the matrix.
+ * @param m Matrix to be transposed.
+ * @return Transposed matrix.
+ */
 Mat mat_transpose(Mat m)
 {
     Mat result = mat_alloc(m.cols, m.rows);
@@ -311,6 +457,12 @@ Mat mat_transpose(Mat m)
     return result;
 }
 
+/**
+ * @brief Multiplies two matrices.
+ * @param a First matrix.
+ * @param b Second matrix.
+ * @return Resulting matrix after multiplication.
+ */
 Mat mat_mul(Mat a, Mat b)
 {
     matrix_ASSERT(a.cols == b.rows);
@@ -319,6 +471,12 @@ Mat mat_mul(Mat a, Mat b)
     return result;
 }
 
+/**
+ * @brief Solves a system of linear equations using Gaussian elimination and back substitution.
+ * @param m Coefficient matrix.
+ * @param x Column matrix representing the right-hand side of the equation.
+ * @return Matrix representing the solution vector.
+ */
 Mat solve(Mat m, Mat x)
 {
     Mat id = fill_identity(m);
@@ -326,6 +484,12 @@ Mat solve(Mat m, Mat x)
     return back_sub(m, x);
 }
 
+/**
+ * @brief Solves a system of linear equations using the least squares method.
+ * @param m Coefficient matrix.
+ * @param x Column matrix representing the right-hand side of the equation.
+ * @return Matrix representing the solution vector.
+ */
 Mat solve_leastSquares(Mat m, Mat x)
 {
     Mat transposed = mat_transpose(m);
@@ -336,6 +500,11 @@ Mat solve_leastSquares(Mat m, Mat x)
     return solve(mtm, right);
 }
 
+/**
+ * @brief Prints the solution of a system of linear equations to the console.
+ * @param m Coefficient matrix.
+ * @param x Column matrix representing the right-hand side of the equation.
+ */
 void print_result(Mat m, Mat x)
 {
     Mat result = solve(m, x);
@@ -344,6 +513,10 @@ void print_result(Mat m, Mat x)
     }
 }
 
+/**
+ * @brief Prints the elements of a matrix to the console.
+ * @param x Matrix to be printed.
+ */
 void print_resultMatrix(Mat x)
 {
     for(size_t i = 0; i < x.rows; i++){
@@ -351,6 +524,11 @@ void print_resultMatrix(Mat x)
     }
 }
 
+/**
+ * @brief Performs the Gram-Schmidt process on the given matrix to obtain an orthogonalized matrix.
+ * @param m Matrix to be orthogonalized.
+ * @return Matrix obtained from the Gram-Schmidt process.
+ */
 Mat compute_gramSchmidt(Mat m)
 {
 
