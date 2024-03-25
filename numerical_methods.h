@@ -64,3 +64,17 @@ float simpson(float interval[], int nbr_points, float (*f)(float)) {
 
     return integral;
 }
+
+void adaptive_Simpson(float interval[], float (*f)(float), float tolerance, float h){
+
+    float integral = 0;
+    float xa = interval[0];
+    float xb = xa + h;
+    while(xb <= interval[1]){
+        float x[2] = {xa, xb};
+        integral += (f(xa) + f(xb)) * (h/2);
+        xa = xb;
+        xb += h;
+    }
+
+}
