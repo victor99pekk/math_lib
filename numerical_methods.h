@@ -76,5 +76,4 @@ void adaptive_Simpson(float interval[], float (*f)(float), float tolerance, floa
         xa = xb;
         xb += h;
     }
-
 }
