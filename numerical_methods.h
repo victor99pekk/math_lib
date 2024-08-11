@@ -54,13 +54,7 @@ float simpson(float interval[], int nbr_points, float (*f)(float)) {
         float middle = (xn + x0) / 2;
         integral += (h/6) * (f(x[index + 1]) + 4 * f(middle) + f(x[index]));
     }
-
-    /* for(int index = 1; index < nbr_points; index++) {
-        // float middle = x[index-1] + (h/2);
-        float middle = (x[index-1] + x[index]) / 2;
-        integral += (h/6) * (f(x[index + 1]) + 4 * f(middle) + f(x[index]));
-    } */
-    free(x);  // don't forget to free the memory when you're done with it
+    free(x);
 
     return integral;
 }
