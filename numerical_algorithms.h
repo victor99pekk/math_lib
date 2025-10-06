@@ -59,15 +59,42 @@ float simpson(float interval[], int nbr_points, float (*f)(float)) {
     return integral;
 }
 
-void adaptive_Simpson(float interval[], float (*f)(float), float tolerance, float h){
 
-    float integral = 0;
-    float xa = interval[0];
-    float xb = xa + h;
-    while(xb <= interval[1]){
-        float x[2] = {xa, xb};
-        integral += (f(xa) + f(xb)) * (h/2);
-        xa = xb;
-        xb += h;
+static float recurse(float a, float b,
+                     float fa, float fb, float fc,
+                     float S, float epsilon, int depth,
+                     float (*f)(float))
+{
+    float c = 0.5f * (a + b);
+    float d = 0.5f * (a + c);
+    float e = 0.5f * (c + b);
+
+    float fd = f(d);
+    float fe = f(e);
+
+    float Sleft  = (c - a) * (fa + 4.0f*fd + fc) / 6.0f;
+    float Sright = (b - c) * (fc + 4.0f*fe + fb) / 6.0f;
+    float S2 = Sleft + Sright;
+
+    if (depth <= 0 || fabsf(S2 - S) <= 15.0f * epsilon) {
+        // Richardson extrapolation
+        return S2 + (S2 - S) / 15.0f;
     }
+
+    // Recurse on halves; split tolerance
+    return recurse(a, c, fa, fc, fd, Sleft,  epsilon * 0.5f, depth - 1, f)
+         + recurse(c, b, fc, fb, fe, Sright, epsilon * 0.5f, depth - 1, f);
+}
+
+float adaptive_Simpson(float (*f)(float), float a, float b,
+                       float epsilon, int maxRecursionDepth)
+{
+    float c  = 0.5f * (a + b);
+    float h  = b - a;
+    float fa = f(a);
+    float fb = f(b);
+    float fc = f(c);
+    float S  = (h) * (fa + 4.0f*fc + fb) / 6.0f;
+
+    return recurse(a, b, fa, fb, fc, S, epsilon, maxRecursionDepth, f);
 }

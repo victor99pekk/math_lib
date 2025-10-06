@@ -205,6 +205,17 @@ void mat_fill(Mat m, float x)
     }
 }
 
+Mat mat_init_with_array(float array[], int rows, int cols)
+{
+    Mat m = mat_alloc(rows, cols);
+    for(size_t i = 0; i < m.rows; i++){
+        for(size_t j = 0; j < m.cols; j++){
+            MAT_AT(m, i, j) = array[i*m.cols + j];
+        }
+    }
+    return m;
+}
+
 /**
  * @brief Fills the matrix with random values in the specified range.
  * @param m Matrix to be filled.
@@ -315,7 +326,7 @@ void copy_col(Mat dst, Mat src, int destCol, int srcCol)
  * @param row1 Index of the first row.
  * @param row2 Index of the second row.
  */
-void switchRow(Mat m, int row1, int row2) {
+void switchRow(Mat m, size_t row1, size_t row2) {
     for (int i = 0; i < m.cols; ++i) {
         float temp = MAT_AT(m, row1, i);
         MAT_AT(m, row1, i) = MAT_AT(m, row2, i);
@@ -351,7 +362,7 @@ Mat fill_identity(Mat m)
  * @param colB Column index from matrix b.
  * @return Resulting matrix after subtraction.
  */
-Mat subtract_cols(Mat a, Mat b, int colA, int colB)
+Mat subtract_cols(Mat a, Mat b, size_t colA, size_t colB)
 {
     Mat result = mat_alloc(a.rows, 1);
     for(size_t i = 0; i < a.rows; i++){
@@ -368,7 +379,7 @@ Mat subtract_cols(Mat a, Mat b, int colA, int colB)
  * @param index Index indicating the current step in elimination.
  * @param ndim Number of dimensions (rows/columns) in the matrix.
  */
-void prepare(Mat m, Mat x, Mat identity, int index, int ndim) {
+void prepare(Mat m, Mat x, Mat identity, size_t index, size_t ndim) {
     matrix_ASSERT(m.rows == x.rows);
 
     if(index >= m.cols || index >= m.rows){
@@ -397,9 +408,8 @@ void prepare(Mat m, Mat x, Mat identity, int index, int ndim) {
  * @brief Performs Gaussian elimination on the matrix.
  * @param m Matrix to be modified.
  * @param x Placeholder matrix.
- * @param identity Identity matrix.
  */
-void eliminate(Mat m, Mat x, Mat identity)
+void eliminate(Mat m, Mat x)
 {
     for(size_t i = 0; i < m.cols; i++){
         //prepare(m, x, identity, i, m.rows - 1);
@@ -471,6 +481,14 @@ Mat mat_mul(Mat a, Mat b)
     return result;
 }
 
+void mat_div(Mat a, float nbr){
+    for (size_t r = 0; r < a.rows; r++){
+        for (size_t c = 0; c < a.cols; c++){
+            MAT_AT(a, r, c) /= nbr;
+        }
+    }
+}
+
 /**
  * @brief Solves a system of linear equations using Gaussian elimination and back substitution.
  * @param m Coefficient matrix.
@@ -479,8 +497,7 @@ Mat mat_mul(Mat a, Mat b)
  */
 Mat solve(Mat m, Mat x)
 {
-    Mat id = fill_identity(m);
-    eliminate(m, x, id);
+    eliminate(m, x);
     return back_sub(m, x);
 }
 
@@ -570,5 +587,6 @@ Mat compute_gramSchmidt(Mat m)
     return mat_mul(Q, R);
 }
 
-#endif //NN_H_
+
+#endif // matrix_H_
 
